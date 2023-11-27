@@ -13,7 +13,7 @@ Welcome to the Turbo Octo Goggles repository, your advanced solution for predict
 
 1. **Clone the Repository**:
    ```
-   git clone https://github.com/yourusername/turbo-octo-goggles.git
+   git clone https://github.com/mohammadzainabbas/turbo-octo-goggles.git
    ```
 2. **Install Dependencies**:
    ```
@@ -26,18 +26,4 @@ Welcome to the Turbo Octo Goggles repository, your advanced solution for predict
 
 ## Using the App 🔍
 
-Select your car's features in the sidebar and get instant price predictions!
-
-## Contributing 🤝
-
-Contributions, issues, and feature requests are welcome! Feel free to check our [issues page](your-issues-link).
-
-## License 📄
-
-Distributed under the XYZ License. See `LICENSE` for more information.
-
-## Contact 📧
-
-Your Name - your@email.com
-
-Project Link: https://github.com/yourusername/turbo-octo-goggles
+Go to the [live demo](https://turbo-octo-goggles.streamlit.app/) and select your car's features in the sidebar and get instant price predictions!
