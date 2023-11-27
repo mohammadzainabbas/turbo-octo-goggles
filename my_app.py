@@ -6,7 +6,7 @@ from sklearn.preprocessing import OrdinalEncoder
 
 st.set_page_config(page_title='Car Price Prediction', page_icon=':car:')
 
-st.sidebar.title('Car Price Prediction')
+st.sidebar.title(':car: Car Price Prediction')
 html_temp = """
 <div style="background:radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);;padding:10px">
 <h2 style="color:white;text-align:center;">Streamlit ML Cloud App </h2>
