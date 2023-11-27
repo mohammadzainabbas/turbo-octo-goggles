@@ -1,0 +1,42 @@
+name: Python Application Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10, 3.11, 3.12]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        architecture: ['x64', 'ARM64']
+        include:
+          - os: macos-latest
+            architecture: ARM64
+
+    steps:
+    - name: Checkout current repo 
+      uses: actions/checkout@v2
+    - name: Set up Python (${{ matrix.python-version }}) - ${{ matrix.architecture }} on ${{ matrix.os }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: ${{ matrix.architecture }}
+    - name: Cache Python dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-python-${{ matrix.python-version }}-
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+    - name: Run Streamlit App
+      run: |
+        streamlit run my_app.py --server.headless true
