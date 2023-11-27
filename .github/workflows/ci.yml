@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-    PYTHON_VERSIONS: '["3.8", "3.9", "3.10", "3.11", "3.12"]'
+    PYTHON_VERSIONS: '["3.8", "3.9", "3.10.0", "3.11", "3.12"]'
 
 jobs:
 
@@ -18,17 +18,8 @@ jobs:
           matrix: ${{ steps.set-matrix.outputs.matrix }}
         steps:
           - id: set-matrix
-            run: echo "::set-output name=matrix::$(jq -c '[.[] | tostring]' <<< "${{ env.PYTHON_VERSIONS }}")"
+            run: echo "matrix=$(jq -c '[.[] | tostring]' <<< "${{ env.PYTHON_VERSIONS }}")" >> $GITHUB_OUTPUT
     
-    # prepare-matrix:
-    #     name: Prepare Matrix Output
-    #     runs-on: ubuntu-latest
-    #     outputs: 
-    #       all_versions: ${{ steps.step1.outputs.matrix }}
-    #     steps: 
-    #       - name: Create Matrix Variable
-    #         id: step1
-    #         run: echo "matrix=$(jq -cr '@json' <<< "${{ env.PYTHON_VERSIONS }}")" >> $GITHUB_OUTPUT
     build-ubuntu:
         name: Build on Ubuntu
         runs-on: ubuntu-latest
@@ -105,8 +96,6 @@ jobs:
             include:
                 - architecture: 'arm64'
                   python-version: '3.12'
-                - architecture: 'arm64'
-                  python-version: '3.13.0-alpha.2'
         steps:
         - name: Checkout current repo
           uses: actions/checkout@v2
