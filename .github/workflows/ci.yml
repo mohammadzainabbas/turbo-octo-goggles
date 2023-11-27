@@ -7,65 +7,100 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+    PYTHON_VERSIONS: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
 jobs:
-  # ... [other jobs remain unchanged]
+    build-ubuntu:
+        runs-on: ubuntu-latest
+        strategy:
+          fail-fast: false
+          matrix:
+            python-version: ${{ fromJson(env.PYTHON_VERSIONS) }}
+            architecture: ['x64']
+        steps:
+        - name: Checkout current repo
+          uses: actions/checkout@v2
+        - name: Set up Python (${{ matrix.python-version }}) - ${{ matrix.architecture }} on Ubuntu
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python-version }}
+            architecture: ${{ matrix.architecture }}
+        - name: Cache Python dependencies
+          uses: actions/cache@v2
+          with:
+            path: ~/.cache/pip
+            key: ubuntu-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+            restore-keys: |
+              ubuntu-python-${{ matrix.python-version }}-
+        - name: Install dependencies
+          run: |
+            pip install -r requirements.txt
+        - name: Run Streamlit App
+          run: |
+            streamlit run my_app.py --server.headless true & sleep 20s; kill $!
 
-  build-windows:
-    runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
-        architecture: ['x64']
-    steps:
-    - name: Checkout current repo
-      uses: actions/checkout@v2
-    - name: Set up Python (${{ matrix.python-version }}) - ${{ matrix.architecture }} on Windows
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: ${{ matrix.architecture }}
-    - name: Cache Python dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~\\AppData\\Local\\pip\\Cache
-        key: windows-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          windows-python-${{ matrix.python-version }}-
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-    - name: Run Streamlit App
-      run: |
-        Start-Process -NoNewWindow -FilePath "streamlit" -ArgumentList "run my_app.py --server.headless true"
-        Start-Sleep -Seconds 20
-        Stop-Process -Name "streamlit"
+    build-windows:
+        runs-on: windows-latest
+        strategy:
+          fail-fast: false
+          matrix:
+            python-version: ${{ fromJson(env.PYTHON_VERSIONS) }}
+            architecture: ['x64']
+        steps:
+        - name: Checkout current repo
+          uses: actions/checkout@v2
+        - name: Set up Python (${{ matrix.python-version }}) - ${{ matrix.architecture }} on Windows
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python-version }}
+            architecture: ${{ matrix.architecture }}
+        - name: Cache Python dependencies
+          uses: actions/cache@v2
+          with:
+            path: ~\\AppData\\Local\\pip\\Cache
+            key: windows-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+            restore-keys: |
+             windows-python-${{ matrix.python-version }}-
+        - name: Install dependencies
+          run: |
+            pip install -r requirements.txt
+        - name: Run Streamlit App
+          run: |
+            Start-Process -NoNewWindow -FilePath "streamlit" -ArgumentList "run my_app.py --server.headless true"
+            Start-Sleep -Seconds 20
+            Stop-Process -Name "streamlit"
 
-  build-macos:
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-alpha.2']
-        architecture: ['x64', 'arm64']
-    steps:
-    - name: Checkout current repo
-      uses: actions/checkout@v2
-    - name: Set up Python (${{ matrix.python-version }}) - ${{ matrix.architecture }} on MacOS
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: ${{ matrix.architecture }}
-    - name: Cache Python dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/Library/Caches/pip
-        key: macos-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          macos-python-${{ matrix.python-version }}-
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-    - name: Run Streamlit App
-      run: |
-        streamlit run my_app.py --server.headless true & sleep 20; kill $!
+    build-macos:
+        runs-on: macos-latest
+        strategy:
+          fail-fast: false
+          matrix:
+            python-version: ${{ fromJson(env.PYTHON_VERSIONS) }}
+            architecture: ['x64']
+            include:
+                - architecture: 'arm64'
+                  python-version: '3.12'
+                - architecture: 'arm64'
+                  python-version: '3.13.0-alpha.2'
+        steps:
+        - name: Checkout current repo
+          uses: actions/checkout@v2
+        - name: Set up Python (${{ matrix.python-version }}) - ${{ matrix.architecture }} on MacOS
+          uses: actions/setup-python@v2
+          with:
+            python-version: ${{ matrix.python-version }}
+            architecture: ${{ matrix.architecture }}
+        - name: Cache Python dependencies
+          uses: actions/cache@v2
+          with:
+            path: ~/Library/Caches/pip
+            key: macos-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+            restore-keys: |
+             macos-python-${{ matrix.python-version }}-
+        - name: Install dependencies
+          run: |
+            pip install -r requirements.txt
+        - name: Run Streamlit App
+          run: |
+            streamlit run my_app.py --server.headless true & sleep 20; kill $!
